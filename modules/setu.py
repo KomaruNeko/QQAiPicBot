@@ -8,6 +8,8 @@ from graia.ariadne.message.chain import MessageChain
 
 from graia.ariadne.message.element import Image as GImage
 
+from graia.ariadne.message.parser.base import DetectPrefix
+
 from graia.ariadne.message.parser.base import DetectSuffix
 
 from graia.ariadne.model import Friend
@@ -171,6 +173,34 @@ def generate_image(prompt):
     return r["images"][0].split(",", 1)[0]
 
 
+def direct_generate_image(prompt):
+    url = user_config.get("stable-diffusion", "url")
+
+    option_payload = {
+        "sd_model_checkpoint": user_config.get("stable-diffusion", "girlmodel"),
+    }
+
+    response = requests.post(url=f"{url}/sdapi/v1/options", json=option_payload)
+
+    payload = {
+        "prompt": "1girl, erotic"
+        + user_config.get("stable-diffusion", "girlprompt")
+        + prompt,
+        "steps": 20,
+        "width": user_config.getint("stable-diffusion", "girlwidth"),
+        "height": user_config.getint("stable-diffusion", "girlheight"),
+        "negative_prompt": user_config.get("stable-diffusion", "girlnegative")
+        + "text, watermark, nsfw, nude, nipples, vaginal, penis",
+        "cfg_scale": user_config.getint("stable-diffusion", "girlcfg"),
+    }
+
+    response = requests.post(url=f"{url}/sdapi/v1/txt2img", json=payload)
+
+    r = response.json()
+
+    return r["images"][0].split(",", 1)[0]
+
+
 @channel.use(
     ListenerSchema(
         listening_events=[GroupMessage, FriendMessage], decorators=[DetectSuffix("图")]
@@ -195,3 +225,19 @@ async def setu(
             image = generate_image(prompt)
 
             await app.send_message(sender, MessageChain(GImage(base64=image)))
+
+#被群友要求直接输入英文prompt所以特地增加的新功能，不建议平常用
+@channel.use(
+    ListenerSchema(
+        listening_events=[GroupMessage, FriendMessage],
+        decorators=[DetectPrefix("aipic ")],
+    )
+)
+async def setu(
+    app: Ariadne, sender: Group | Friend, message: MessageChain = DetectPrefix("aipic ")
+):
+    prompt = message.display
+    await app.send_message(sender, MessageChain(f"正在生成{prompt}涩图,请稍等... "))
+    image = direct_generate_image(prompt)
+
+    await app.send_message(sender, MessageChain(GImage(base64=image)))
