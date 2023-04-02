@@ -44,6 +44,7 @@ async def handle_group_chat(
 ):
     global groupMembers
     groupMembers[member.name + str(group.id)] = member.id
+    groupMembers[str(member.id) + str(group.id)] = member.id
 
 
 def generate_member_image(avatar):
@@ -86,7 +87,7 @@ async def handle_group_chat(
     content = content.replace(" ", "")
     content = content.replace("@", "")
     if member.name + str(group.id) in groupMembers.keys():
-        id = groupMembers[member.name + str(group.id)]
+        id = groupMembers[content + str(group.id)]
         async with Ariadne.service.client_session.get(
             f"https://q2.qlogo.cn/headimg_dl?dst_uin={id}&spec=640"
         ) as resp:
