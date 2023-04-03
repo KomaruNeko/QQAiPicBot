@@ -3,12 +3,11 @@
 这个bot可以实时生成涩图发给群友或好友。生成图片用的时自己电脑的gpu。
 (注：该文档内的“涩图”指的是单个美少女的图)
 - 召唤关键词：
-  - **怎么搞图** - 查看ai生成图功能的使用说明
+- - **说明书/怎么用/使用说明/陪我/召唤** - 使用说明
   - **来张xx图** - ai生成图，关键词用空格或逗号隔开。中文关键词会自动机翻成英文
-  - **怎么搞涩图** - 查看ai生成涩图功能的使用说明
   - **来张xx涩图** - ai生成涩图，关键词用空格或逗号隔开。中文关键词会自动机翻成英文
   - **aipic xxx** - ai生成涩图，xxx直接输入英文prompt
-  - **@xxx 变成涩图** - 把群员xxx的头像变成涩图 （只有在bot开启时说过话的群员才能被变成涩图）
+  - **@xxx 变成xxx涩图** - 把群员xxx的头像变成xxx（关键词）涩图 （如果@后面输入的是昵称，则只有在bot开启时说过话的群员才能被变成涩图，如果@后面的是qq号，那么可能会把群成员以外的qq号的头像变成涩图）
 - 由于会爆显存，ai智能聊天助手目前属于关闭状态。想开启的话（非常不建议），把modules里面的_chat.py改为chat.py即可。日后可能会换成使用线上服务器的gpt模型，目前只考虑离线是因为科学上网不方便会被封号。
 
 ### 安装配置
@@ -25,8 +24,9 @@
    
 #### 2. 手动安装mcl
 1. 手动安装 [mirai-console-loader](https://github.com/iTXTech/mirai-console-loader)，参考该repo的**手动安装**部分
-2. 安装[mirai-api-http](https://github.com/project-mirai/mirai-api-http)，参考该repo的**安装mirai-api-http**和**开始使用**部分
-3. 在[fix-protocol-version](https://github.com/cssxsh/fix-protocol-version/releases/tag/v1.3.0)，下载fix-protocol-version-1.3.0.mirai2.jar，并移入 [你的mcl地址]\plugins 目录中
+2. 安装 [mirai-api-http](https://github.com/project-mirai/mirai-api-http)，参考该repo的**安装mirai-api-http**和**开始使用**部分
+3. 在 [fix-protocol-version](https://github.com/cssxsh/fix-protocol-version/releases/tag/v1.3.0)，下载fix-protocol-version-1.3.0.mirai2.jar，并移入 [你的mcl地址]\plugins 目录中
+   注：如果登陆遇到问题，建议查看这里 [mcl无法登录的临时处理方案](https://mirai.mamoe.net/topic/223/%E6%97%A0%E6%B3%95%E7%99%BB%E5%BD%95%E7%9A%84%E4%B8%B4%E6%97%B6%E5%A4%84%E7%90%86%E6%96%B9%E6%A1%88)。个人推荐先试试清空mcl目录下bots文件夹里的内容。
 
 
 #### 3. 安装requirements
