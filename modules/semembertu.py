@@ -86,7 +86,7 @@ async def handle_group_chat(
     app: Ariadne, group: Group, member: Member, message: MessageChain
 ):
     content = message.display
-    end = content.find(" ")
+    end = content.find(" 变")
 
     if end != -1:
         id_or_name = content[1:end]
