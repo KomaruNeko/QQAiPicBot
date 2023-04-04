@@ -94,7 +94,7 @@ async def handle_group_chat(
         id = "NaN"
 
         if id_or_name + str(group.id) in groupMembersNametoId.keys():
-            id = int(groupMembersNametoId[content + str(group.id)])
+            id = int(groupMembersNametoId[id_or_name + str(group.id)])
 
         elif id_or_name.isdecimal() and len(id_or_name) < 12 and len(id_or_name) > 4:
             id = int(id_or_name)
