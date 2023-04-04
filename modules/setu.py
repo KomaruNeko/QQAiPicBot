@@ -1,35 +1,20 @@
 from graia.ariadne.app import Ariadne
-
 from graia.ariadne.event.message import GroupMessage
-
 from graia.ariadne.event.message import FriendMessage
-
 from graia.ariadne.message.chain import MessageChain
-
 from graia.ariadne.message.element import Image as GImage
-
 from graia.ariadne.message.parser.base import DetectPrefix
-
 from graia.ariadne.message.parser.base import DetectSuffix
-
 from graia.ariadne.model import Friend
-
 from graia.ariadne.model import Group
 
-
 from graia.saya import Channel
-
 from graia.saya.builtins.broadcast.schema import ListenerSchema
 
-
 import json
-
 import requests
-
 import base64
-
 from PIL import Image, PngImagePlugin
-
 
 from pypinyin import lazy_pinyin
 
@@ -54,6 +39,7 @@ user_config.read(config_path, encoding="utf-8")
 keyword_dictionary = dict(user_config.items("dictionary"))
 
 def prompt_translation(prompt):
+    os.environ['NO_PROXY'] = "api.mymemory.translated.net"
     translator = Translator(from_lang="zh", to_lang="en")
 
     keywords = re.split("[.,， :()/]", prompt)
