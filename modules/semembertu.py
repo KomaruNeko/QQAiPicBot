@@ -24,7 +24,9 @@ from pypinyin import lazy_pinyin
 
 from modules.setu import prompt_translation
 
+import asyncio
 
+event = asyncio.Event()
 channel = Channel.current()
 
 user_config = configparser.ConfigParser()
@@ -76,6 +78,22 @@ def generate_member_image(avatar, prompt):
 
     return r["images"][0].split(",", 1)[0]
 
+async def draw_and_send_semembertu(app, group, id, prompt):
+    await asyncio.sleep(1)
+    
+    await app.send_message(
+        group, MessageChain("正在生成", At(id), " 的", prompt, "涩图...")
+    )
+    async with Ariadne.service.client_session.get(
+        f"https://q2.qlogo.cn/headimg_dl?dst_uin={id}&spec=640"
+    ) as resp:
+        avatar = await resp.read()
+    await app.send_message(
+        group,
+        MessageChain(GImage(base64=generate_member_image(avatar, prompt))),
+    )
+    
+    event.set()
 
 @channel.use(
     ListenerSchema(
@@ -108,15 +126,7 @@ async def handle_group_chat(
                 prompt = prompt[:-2]
             if len(prompt) > 0 and prompt[0] == "成":
                 prompt = prompt[1:]
-            await app.send_message(
-                group, MessageChain("正在生成", At(id), " 的", prompt, "涩图...")
-            )
-            async with Ariadne.service.client_session.get(
-                f"https://q2.qlogo.cn/headimg_dl?dst_uin={id}&spec=640"
-            ) as resp:
-                avatar = await resp.read()
 
-            await app.send_message(
-                group,
-                MessageChain(GImage(base64=generate_member_image(avatar, prompt))),
-            )
+        await draw_and_send_semembertu(app, group, id, prompt)
+        await event.wait()
+        event.clear()
