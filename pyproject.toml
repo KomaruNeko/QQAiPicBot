@@ -22,7 +22,6 @@ dependencies = [
     "torch",
     "transformers",
     "translate",
-    
 ]
 
 [build-system]
