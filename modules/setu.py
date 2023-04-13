@@ -47,10 +47,14 @@ def prompt_translation(prompt):
 
     for i in keywords:
         if i in keyword_dictionary:
-            translations += keyword_dictionary[i] + ", "
+            translations += keyword_dictionary[i].lower() + ", "
 
         else:
-            translations += translator.translate(i) + ", "
+            translations += translator.translate(i).lower() + ", "
+    
+    for negative in ["nsfw", "nude", "nipples", "vaginal", "penis", "topless", "nudity"]:
+        translations = translations.replace(negative, "")
+
 
     return translations + "masterpiece, best quality, illustration, "
 
@@ -68,9 +72,9 @@ def prompt_translation_girl(prompt):
         elif i == user_config.get("stable-diffusion", "erolock"):
             nsfw = True
         elif i in keyword_dictionary:
-            translations += keyword_dictionary[i] + ", "
+            translations += keyword_dictionary[i].lower() + ", "
         else:
-            translations += translator.translate(i) + ", "
+            translations += translator.translate(i).lower() + ", "
 
     if realistic:
         translations += user_config.get("stable-diffusion", "realprompt")
@@ -80,7 +84,10 @@ def prompt_translation_girl(prompt):
         negative_prompt = user_config.get("stable-diffusion", "girlnegative")
 
     if not nsfw:
-        negative_prompt += "nsfw, nude, nipples, vaginal, penis"
+        negative_prompt += "nsfw, nude, nipples, vaginal, penis, topless, nudity"
+        for negative in ["nsfw", "nude", "nipples", "vaginal", "penis", "topless", "nudity"]:
+            translations = translations.replace(negative, "")
+
 
     return realistic, translations, negative_prompt
 
@@ -129,7 +136,7 @@ def generate_image(prompt):
         "steps": 20,
         "width": user_config.getint("stable-diffusion", "width"),
         "height": user_config.getint("stable-diffusion", "height"),
-        "negative_prompt": "text, watermark, nsfw, nude, nipples, vaginal, penis",
+        "negative_prompt": "text, watermark, nsfw, nude, nipples, vaginal, penis, topless, nudity",
         "cfg_scale": user_config.getint("stable-diffusion", "cfg"),
     }
 
