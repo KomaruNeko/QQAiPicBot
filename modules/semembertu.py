@@ -68,7 +68,7 @@ def generate_member_image(avatar, prompt):
         "width": 640,
         "height": 640,
         "negative_prompt": user_config.get("stable-diffusion", "girlnegative")
-        + "nsfw, nude, nipples, vaginal, penis",
+        + "nsfw, nude, nipples, vaginal, penis, topless, nudity",
         "cfg_scale": user_config.getint("stable-diffusion", "girlcfg"),
     }
 
