@@ -30,7 +30,13 @@
 
 
 #### 3. 安装requirements
-1. 在命令行中，运行`pip install -r requirements.txt`
+1. 在终端中打开该文件夹，运行`pip install -r requirements.txt`
+####  (如果你想用 anaconda)
+   - 在anaconda shell中打开该文件夹，运行`conda create --name QQAiPicBot python=3.10 -y`
+   - `conda activate QQAiPicBot`
+   - `pip install -r requirements.txt`
+   - 使用时不要运行bot.bat，直接在anaconda shell 在anaconda shell中打开该文件夹，运行`conda activate QQAiPicBot`，然后运行`python main.py`
+
 
 ### 开始使用
 1. 在你想要安装这个bot的目录下右键打开git, 输入命令行`git clone https://github.com/KomaruNeko/QQAiPicBot.git`

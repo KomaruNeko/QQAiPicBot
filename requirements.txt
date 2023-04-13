@@ -1,5 +1,7 @@
 cpm_kernels>=1.0.11
 creart>=0.2.2
+graia-ariadne[standard]==0.11.2
+graia-saya==0.0.17
 icetk>=0.0.4
 numpy>=1.21.2
 Pillow>=8.4.0
