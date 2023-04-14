@@ -101,12 +101,14 @@ def generate_girl_image(prompt):
             "sd_model_checkpoint": user_config.get("stable-diffusion", "realmodel")
         }
         response = requests.post(url=f"{url}/sdapi/v1/options", json=option_payload)
+        cfg = user_config.getint("stable-diffusion", "realcfg")
 
     else:
         option_payload = {
             "sd_model_checkpoint": user_config.get("stable-diffusion", "girlmodel"),
         }
         response = requests.post(url=f"{url}/sdapi/v1/options", json=option_payload)
+        cfg = user_config.getint("stable-diffusion", "girlcfg")
 
     payload = {
         "prompt": translations,
@@ -114,8 +116,9 @@ def generate_girl_image(prompt):
         "width": user_config.getint("stable-diffusion", "girlwidth"),
         "height": user_config.getint("stable-diffusion", "girlheight"),
         "negative_prompt": negative_prompt,
-        "cfg_scale": user_config.getint("stable-diffusion", "girlcfg"),
+        "cfg_scale": cfg
     }
+    
     response = requests.post(url=f"{url}/sdapi/v1/txt2img", json=payload)
     r = response.json()
     
