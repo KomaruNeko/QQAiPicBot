@@ -14,10 +14,10 @@ channel = Channel.current()
 
 @channel.use(ListenerSchema(listening_events=[GroupMessage, FriendMessage]))
 async def setu(app: Ariadne, sender: Group | Friend, message: MessageChain):
-    if message.display in ["说明书", "使用说明", "陪我","怎么用","召唤"]:
+    if message.display in ["说明书", "使用说明", "陪我", "怎么用", "召唤"]:
         await app.send_message(
             sender,
             MessageChain(
-                "是你在召唤我吗？你是要先聊天，还是先涩涩，还是要...?\n召唤关键词：\n1. 说明书/怎么用/使用说明/陪我/召唤 - 使用说明\n2. 来张xx图 - ai生成图，关键词用空格或逗号隔开。中文关键词会自动机翻成英文。\n3. 来张xx涩图 - ai生成涩图，关键词用空格或逗号隔开。中文关键词会自动机翻成英文。\n 4. aipic xxx - ai生成涩图，xxx直接输入英文prompt\n 5. @xxx 变成xxx涩图 - 把群员xxx的头像变成xxx（关键词）涩图"
+                "是你在召唤我吗？你是要先聊天，还是先涩涩，还是要...?\n召唤关键词：\n1. 说明书/怎么用/使用说明/陪我/召唤 - 使用说明\n2. 来张xx图 - ai生成图，关键词用空格或逗号隔开。中文关键词会自动机翻成英文。\n3. 来张xx涩图 - ai生成涩图，关键词用空格或逗号隔开。中文关键词会自动机翻成英文。\n 4. aipic xxx - ai生成涩图，xxx直接输入英文prompt\n 5. @xxx 变成xxx涩图 - 把群员xxx的头像变成xxx（关键词）涩图\n 注：xxx关键词中如果出现-ng ,则-ng 之后的关键词将会是negative prompt"
             ),
         )

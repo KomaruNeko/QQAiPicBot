@@ -38,105 +38,155 @@ user_config.read(config_path, encoding="utf-8")
 
 keyword_dictionary = dict(user_config.items("dictionary"))
 
+
 def prompt_translation(prompt):
-    os.environ['NO_PROXY'] = "api.mymemory.translated.net"
+    ngflag = False
+    if re.fullmatch("[A-Za-z0-9:(), ]+", prompt):
+        return prompt
+    os.environ["NO_PROXY"] = "api.mymemory.translated.net"
     translator = Translator(from_lang="zh", to_lang="en")
 
-    keywords = re.split("[.,， :()/]", prompt)
-    translations = ""
-
+    keywords = re.split("[.,， /]", prompt)
+    positive_prompt = ""
+    negative_prompt = ""
     for i in keywords:
-        if i in keyword_dictionary:
-            translations += keyword_dictionary[i].lower() + ", "
-
+        if ngflag == False:
+            if i == "-ng":
+                ngflag = True
+            elif i in keyword_dictionary:
+                positive_prompt += keyword_dictionary[i].lower() + ", "
+            elif re.fullmatch("[A-Za-z0-9:()]+", i) != None:
+                positive_prompt += i + ", "
+            else:
+                positive_prompt += translator.translate(i).lower() + ", "
         else:
-            translations += translator.translate(i).lower() + ", "
-    
-    for negative in ["nsfw", "nude", "nipples", "vaginal", "penis", "topless", "nudity"]:
-        translations = translations.replace(negative, "")
+            if i in keyword_dictionary:
+                negative_prompt += keyword_dictionary[i].lower() + ", "
+            elif re.fullmatch("[A-Za-z0-9:()]+", i) != None:
+                negative_prompt += i + ", "
+            else:
+                negative_prompt += translator.translate(i).lower() + ", "
 
+    for negative in [
+        "nsfw",
+        "nude",
+        "nipples",
+        "vaginal",
+        "penis",
+        "topless",
+        "nudity",
+    ]:
+        positive_prompt = positive_prompt.replace(negative, "")
 
-    return translations + "masterpiece, best quality, illustration, "
+    return positive_prompt, negative_prompt
 
 
 def prompt_translation_girl(prompt):
     realistic = False
     nsfw = False
-    translator = Translator(from_lang="zh", to_lang="en")
-    keywords = re.split("[.,， :()/]", prompt)
-    translations = "1girl, erotic, "
-
-    for i in keywords:
-        if i == "真人":
-            realistic = True
-        elif i == user_config.get("stable-diffusion", "erolock"):
-            nsfw = True
-        elif i in keyword_dictionary:
-            translations += keyword_dictionary[i].lower() + ", "
-        else:
-            translations += translator.translate(i).lower() + ", "
-
-    if realistic:
-        translations += user_config.get("stable-diffusion", "realprompt")
-        negative_prompt = user_config.get("stable-diffusion", "realnegative")
+    ngflag = False
+    if re.fullmatch("[A-Za-z0-9:(), ]+", prompt) != None:
+        positive_prompt = "1girl, erotic, " + prompt
     else:
-        translations += user_config.get("stable-diffusion", "girlprompt")
-        negative_prompt = user_config.get("stable-diffusion", "girlnegative")
+        translator = Translator(from_lang="zh", to_lang="en")
+        keywords = re.split("[.,， :()/]", prompt)
+        positive_prompt = "1girl, erotic, "
+        negative_prompt = ""
+        for i in keywords:
+            if ngflag == False:
+                if i == "-ng":
+                    ngflag = True
+                elif i == "真人":
+                    realistic = True
+                elif i == user_config.get("stable-diffusion", "erolock"):
+                    nsfw = True
+                elif i in keyword_dictionary:
+                    positive_prompt += keyword_dictionary[i].lower() + ", "
+                elif re.fullmatch("[A-Za-z0-9:]+", i) != None:
+                    positive_prompt += i + ", "
+                else:
+                    positive_prompt += translator.translate(i).lower() + ", "
+            else:
+                if i in keyword_dictionary:
+                    negative_prompt += keyword_dictionary[i].lower() + ", "
+                elif re.fullmatch("[A-Za-z0-9:]+", i) != None:
+                    negative_prompt += i + ", "
+                else:
+                    negative_prompt += translator.translate(i).lower() + ", "
+
+        if realistic:
+            positive_prompt += user_config.get("stable-diffusion", "realprompt")
+            negative_prompt += user_config.get("stable-diffusion", "realnegative")
+        else:
+            positive_prompt += user_config.get("stable-diffusion", "girlprompt")
+            negative_prompt += user_config.get("stable-diffusion", "girlnegative")
 
     if not nsfw:
         negative_prompt += "nsfw, nude, nipples, vaginal, penis, topless, nudity"
-        for negative in ["nsfw", "nude", "nipples", "vaginal", "penis", "topless", "nudity"]:
-            translations = translations.replace(negative, "")
+        for negative in [
+            "nsfw",
+            "nude",
+            "nipples",
+            "vaginal",
+            "penis",
+            "topless",
+            "nudity",
+        ]:
+            positive_prompt = positive_prompt.replace(negative, "")
 
-
-    return realistic, translations, negative_prompt
+    return realistic, positive_prompt, negative_prompt
 
 
 def generate_girl_image(prompt):
     url = user_config.get("stable-diffusion", "url")
-    realistic, translations, negative_prompt = prompt_translation_girl(prompt)
-    
+    realistic, positive_prompt, negative_prompt = prompt_translation_girl(prompt)
+
     if realistic:
         option_payload = {
             "sd_model_checkpoint": user_config.get("stable-diffusion", "realmodel")
         }
         response = requests.post(url=f"{url}/sdapi/v1/options", json=option_payload)
+        cfg = user_config.getint("stable-diffusion", "realcfg")
 
     else:
         option_payload = {
             "sd_model_checkpoint": user_config.get("stable-diffusion", "girlmodel"),
         }
         response = requests.post(url=f"{url}/sdapi/v1/options", json=option_payload)
+        cfg = user_config.getint("stable-diffusion", "girlcfg")
 
     payload = {
-        "prompt": translations,
+        "prompt": positive_prompt,
         "steps": 20,
         "width": user_config.getint("stable-diffusion", "girlwidth"),
         "height": user_config.getint("stable-diffusion", "girlheight"),
         "negative_prompt": negative_prompt,
-        "cfg_scale": user_config.getint("stable-diffusion", "girlcfg"),
+        "cfg_scale": cfg,
     }
+
     response = requests.post(url=f"{url}/sdapi/v1/txt2img", json=payload)
     r = response.json()
-    
+
     return r["images"][0].split(",", 1)[0]
 
 
 def generate_image(prompt):
     url = user_config.get("stable-diffusion", "url")
-    translations = prompt_translation(prompt)
-    
+    positive_prompt, negative_prompt = prompt_translation(prompt)
+
     option_payload = {
         "sd_model_checkpoint": user_config.get("stable-diffusion", "othermodel"),
     }
     response = requests.post(url=f"{url}/sdapi/v1/options", json=option_payload)
 
     payload = {
-        "prompt": translations,
+        "prompt": user_config.get("stable-diffusion", "otherprompt") + positive_prompt,
         "steps": 20,
         "width": user_config.getint("stable-diffusion", "width"),
         "height": user_config.getint("stable-diffusion", "height"),
-        "negative_prompt": "text, watermark, nsfw, nude, nipples, vaginal, penis, topless, nudity",
+        "negative_prompt": user_config.get("stable-diffusion", "othernegative")
+        + "text, watermark, nsfw, nude, nipples, vaginal, penis, topless, nudity"
+        + negative_prompt,
         "cfg_scale": user_config.getint("stable-diffusion", "cfg"),
     }
 
@@ -154,14 +204,21 @@ def direct_generate_image(prompt):
     }
     response = requests.post(url=f"{url}/sdapi/v1/options", json=option_payload)
 
+    ngindex = prompt.find("-ng ")
+    if ngindex == -1:
+        positives = prompt
+        negatives = ""
+    else:
+        positives = prompt[0:ngindex]
+        negatives = prompt[ngindex + 4 :] + ", "
     payload = {
-        "prompt": "1girl, erotic"
+        "prompt": "1girl, erotic, "
         + user_config.get("stable-diffusion", "girlprompt")
-        + prompt,
+        + positives,
         "steps": 20,
         "width": user_config.getint("stable-diffusion", "girlwidth"),
         "height": user_config.getint("stable-diffusion", "girlheight"),
-        "negative_prompt": user_config.get("stable-diffusion", "girlnegative")
+        "negative_prompt": negatives + user_config.get("stable-diffusion", "girlnegative")
         + "text, watermark, nsfw, nude, nipples, vaginal, penis",
         "cfg_scale": user_config.getint("stable-diffusion", "girlcfg"),
     }
@@ -171,32 +228,36 @@ def direct_generate_image(prompt):
 
     return r["images"][0].split(",", 1)[0]
 
+
 async def draw_and_send_setu(app, sender, prompt):
     await asyncio.sleep(1)
-    
+
     await app.send_message(sender, MessageChain(f"正在生成{prompt}涩图,请稍等... "))
     image = generate_girl_image(prompt)
     await app.send_message(sender, MessageChain(GImage(base64=image)))
 
     event.set()
 
+
 async def draw_and_send_tu(app, sender, prompt):
     await asyncio.sleep(1)
-    
+
     await app.send_message(sender, MessageChain(f"正在生成{prompt}图,请稍等... "))
     image = generate_image(prompt)
     await app.send_message(sender, MessageChain(GImage(base64=image)))
 
     event.set()
-    
+
+
 async def draw_and_direct_send_tu(app, sender, prompt):
     await asyncio.sleep(1)
-    
+
     await app.send_message(sender, MessageChain(f"正在生成{prompt}涩图,请稍等... "))
     image = direct_generate_image(prompt)
     await app.send_message(sender, MessageChain(GImage(base64=image)))
 
     event.set()
+
 
 @channel.use(
     ListenerSchema(
@@ -212,14 +273,15 @@ async def setu(
             await draw_and_send_setu(app, sender, prompt)
             await event.wait()
             event.clear()
-            
+
         else:
             prompt = message.display[2:]
             await draw_and_send_tu(app, sender, prompt)
             await event.wait()
             event.clear()
 
-#被群友要求直接输入英文prompt所以特地增加的新功能，不建议平常用
+
+# 被群友要求直接输入英文prompt所以特地增加的新功能，不建议平常用
 @channel.use(
     ListenerSchema(
         listening_events=[GroupMessage, FriendMessage],

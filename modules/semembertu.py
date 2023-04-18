@@ -22,7 +22,7 @@ import re
 
 from pypinyin import lazy_pinyin
 
-from modules.setu import prompt_translation
+from modules.setu import prompt_translation_girl
 
 import asyncio
 
@@ -52,15 +52,23 @@ async def handle_group_chat(
 
 def generate_member_image(avatar, prompt):
     url = user_config.get("stable-diffusion", "url")
-    translation = prompt_translation(prompt)
-    option_payload = {
-        "sd_model_checkpoint": user_config.get("stable-diffusion", "girlmodel"),
-    }
+    realistic, translations, negative_prompt = prompt_translation_girl(prompt)
+    if realistic:
+        option_payload = {
+            "sd_model_checkpoint": user_config.get("stable-diffusion", "realmodel")
+        }
+        response = requests.post(url=f"{url}/sdapi/v1/options", json=option_payload)
+        cfg = user_config.getint("stable-diffusion", "realcfg")
 
-    response = requests.post(url=f"{url}/sdapi/v1/options", json=option_payload)
+    else:
+        option_payload = {
+            "sd_model_checkpoint": user_config.get("stable-diffusion", "girlmodel"),
+        }
+        response = requests.post(url=f"{url}/sdapi/v1/options", json=option_payload)
+        cfg = user_config.getint("stable-diffusion", "girlcfg")
 
     payload = {
-        "prompt": "1girl, erotic, " + translation,
+        "prompt": translations,
         "init_images": [
             "data:image/png;base64," + str(base64.b64encode(avatar), "utf-8")
         ],
@@ -69,7 +77,7 @@ def generate_member_image(avatar, prompt):
         "height": 640,
         "negative_prompt": user_config.get("stable-diffusion", "girlnegative")
         + "nsfw, nude, nipples, vaginal, penis, topless, nudity",
-        "cfg_scale": user_config.getint("stable-diffusion", "girlcfg"),
+        "cfg_scale": cfg,
     }
 
     response = requests.post(url=f"{url}/sdapi/v1/img2img", json=payload)
