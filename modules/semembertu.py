@@ -35,6 +35,8 @@ folder_path = os.path.dirname(dir_path)
 config_path = os.path.join(folder_path, "config.ini")
 user_config.read(config_path, encoding="utf-8")
 
+os.environ["NO_PROXY"] = "api.mymemory.translated.net"
+    
 keyword_dictionary = dict(user_config.items("dictionary"))
 
 groupMembersNametoId = {}
