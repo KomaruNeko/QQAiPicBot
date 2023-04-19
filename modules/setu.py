@@ -36,6 +36,8 @@ folder_path = os.path.dirname(dir_path)
 config_path = os.path.join(folder_path, "config.ini")
 user_config.read(config_path, encoding="utf-8")
 
+os.environ["NO_PROXY"] = "api.mymemory.translated.net"
+
 keyword_dictionary = dict(user_config.items("dictionary"))
 
 
@@ -43,7 +45,6 @@ def prompt_translation(prompt):
     ngflag = False
     if re.fullmatch("[A-Za-z0-9:(), ]+", prompt):
         return prompt
-    os.environ["NO_PROXY"] = "api.mymemory.translated.net"
     translator = Translator(from_lang="zh", to_lang="en")
 
     keywords = re.split("[.,， /]", prompt)
