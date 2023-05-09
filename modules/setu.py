@@ -40,13 +40,45 @@ os.environ["NO_PROXY"] = "api.mymemory.translated.net"
 
 keyword_dictionary = dict(user_config.items("dictionary"))
 
+def full_english_checker(prompt):
+    keywords = re.split("[.,，/]", prompt)
+    for i in keywords:
+        if i in keyword_dictionary.keys():
+            return False
+    if re.fullmatch("[A-Za-z0-9:(), ]+", prompt) != None:
+        return True
+    return False
 
+def keyword_dictionary_parser(keyword):
+    translation = keyword_dictionary[keyword]
+    rm = translation.find(" -rm ")
+    ng = translation.find(" -ng ")
+    if rm == -1 and ng == -1:
+        return translation, None, None
+    if ng == -1:
+        return translation[0: rm], translation[rm+5:], None
+    if rm == -1:
+        return translation[0: ng], None, translation[ng+5:]
+    if rm < ng:
+        return translation[0: rm], translation[rm+5:ng], translation[ng+5: ]
+    return translation[0: ng], translation[rm+5:], translation[ng+5:rm]
+    
+    
 def prompt_translation(prompt):
     ngflag = False
-    if re.fullmatch("[A-Za-z0-9:(), ]+", prompt):
+    remove = [
+            "nsfw",
+            "nude",
+            "nipples",
+            "vaginal",
+            "penis",
+            "topless",
+            "nudity",
+        ]
+    if full_english_checker(prompt):
         return prompt
+    
     translator = Translator(from_lang="zh", to_lang="en")
-
     keywords = re.split("[.,， /]", prompt)
     positive_prompt = ""
     negative_prompt = ""
@@ -59,24 +91,22 @@ def prompt_translation(prompt):
             elif re.fullmatch("[A-Za-z0-9:()]+", i) != None:
                 positive_prompt += i + ", "
             else:
-                positive_prompt += translator.translate(i).lower() + ", "
+                translation, rm, ng = keyword_dictionary_parser(i)
+                positive_prompt += translation.lower() + ", "
+                if rm:
+                    for r in re.split("[.,， :()/]", rm):
+                        remove.append(r)
+                if ng:
+                    negative_prompt += ng
         else:
             if i in keyword_dictionary:
-                negative_prompt += keyword_dictionary[i].lower() + ", "
+                negative_prompt += keyword_dictionary_parser(i)[0].lower() + ", "
             elif re.fullmatch("[A-Za-z0-9:()]+", i) != None:
                 negative_prompt += i + ", "
             else:
                 negative_prompt += translator.translate(i).lower() + ", "
 
-    for negative in [
-        "nsfw",
-        "nude",
-        "nipples",
-        "vaginal",
-        "penis",
-        "topless",
-        "nudity",
-    ]:
+    for negative in remove:
         positive_prompt = positive_prompt.replace(negative, "")
 
     return positive_prompt, negative_prompt
@@ -86,13 +116,22 @@ def prompt_translation_girl(prompt):
     realistic = False
     nsfw = False
     ngflag = False
-    if re.fullmatch("[A-Za-z0-9:(), ]+", prompt) != None:
+    remove = [
+            "nsfw",
+            "nude",
+            "nipples",
+            "vaginal",
+            "penis",
+            "topless",
+            "nudity",
+        ]
+    negative_prompt = ""
+    if full_english_checker(prompt):
         positive_prompt = "1girl, erotic, " + prompt
     else:
         translator = Translator(from_lang="zh", to_lang="en")
         keywords = re.split("[.,， :()/]", prompt)
         positive_prompt = "1girl, erotic, "
-        negative_prompt = ""
         for i in keywords:
             if ngflag == False:
                 if i == "-ng":
@@ -102,14 +141,20 @@ def prompt_translation_girl(prompt):
                 elif i == user_config.get("stable-diffusion", "erolock"):
                     nsfw = True
                 elif i in keyword_dictionary:
-                    positive_prompt += keyword_dictionary[i].lower() + ", "
+                    translation, rm, ng = keyword_dictionary_parser(i)
+                    positive_prompt += translation.lower() + ", "
+                    if rm:
+                        for r in re.split("[.,， :()/]", rm):
+                            remove.append(r)
+                    if ng:
+                        negative_prompt += ng
                 elif re.fullmatch("[A-Za-z0-9:]+", i) != None:
                     positive_prompt += i + ", "
                 else:
                     positive_prompt += translator.translate(i).lower() + ", "
             else:
                 if i in keyword_dictionary:
-                    negative_prompt += keyword_dictionary[i].lower() + ", "
+                    negative_prompt += keyword_dictionary_parser(i)[0].lower() + ", "
                 elif re.fullmatch("[A-Za-z0-9:]+", i) != None:
                     negative_prompt += i + ", "
                 else:
@@ -124,15 +169,7 @@ def prompt_translation_girl(prompt):
 
     if not nsfw:
         negative_prompt += "nsfw, nude, nipples, vaginal, penis, topless, nudity"
-        for negative in [
-            "nsfw",
-            "nude",
-            "nipples",
-            "vaginal",
-            "penis",
-            "topless",
-            "nudity",
-        ]:
+        for negative in remove:
             positive_prompt = positive_prompt.replace(negative, "")
 
     return realistic, positive_prompt, negative_prompt
