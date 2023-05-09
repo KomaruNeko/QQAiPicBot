@@ -87,10 +87,6 @@ def prompt_translation(prompt):
             if i == "-ng":
                 ngflag = True
             elif i in keyword_dictionary:
-                positive_prompt += keyword_dictionary[i].lower() + ", "
-            elif re.fullmatch("[A-Za-z0-9:()]+", i) != None:
-                positive_prompt += i + ", "
-            else:
                 translation, rm, ng = keyword_dictionary_parser(i)
                 positive_prompt += translation.lower() + ", "
                 if rm:
@@ -98,6 +94,10 @@ def prompt_translation(prompt):
                         remove.append(r)
                 if ng:
                     negative_prompt += ng
+            elif re.fullmatch("[A-Za-z0-9:()]+", i) != None:
+                positive_prompt += i + ", "
+            else:
+                positive_prompt += translator.translate(i).lower() + ", "
         else:
             if i in keyword_dictionary:
                 negative_prompt += keyword_dictionary_parser(i)[0].lower() + ", "
