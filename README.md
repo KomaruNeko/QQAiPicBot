@@ -26,7 +26,7 @@
 #### 2. 手动安装mcl
 1. 手动安装 [mirai-console-loader](https://github.com/iTXTech/mirai-console-loader)，参考该repo的**手动安装**部分
 2. 安装 [mirai-api-http](https://github.com/project-mirai/mirai-api-http)，参考该repo的**安装mirai-api-http**和**开始使用**部分
-3. 在 [fix-protocol-version](https://github.com/cssxsh/fix-protocol-version/releases/tag/v1.3.0)，下载fix-protocol-version-1.3.0.mirai2.jar，并移入 [你的mcl地址]\plugins 目录中
+3. 在 [fix-protocol-version](https://github.com/cssxsh/fix-protocol-version/releases)，下载最新fix-protocol-version-x.x.x.mirai2.jar，并移入 [你的mcl地址]\plugins 目录中
    注：如果登陆遇到问题，建议查看这里 [mcl无法登录的临时处理方案](https://mirai.mamoe.net/topic/223/%E6%97%A0%E6%B3%95%E7%99%BB%E5%BD%95%E7%9A%84%E4%B8%B4%E6%97%B6%E5%A4%84%E7%90%86%E6%96%B9%E6%A1%88)。个人推荐先试试清空mcl目录下bots文件夹里的内容。
 
 
@@ -43,5 +43,5 @@
 1. 在你想要安装这个bot的目录下右键打开git, 输入命令行`git clone https://github.com/KomaruNeko/QQAiPicBot.git`
 2. 根据说明，修改 config.ini
 3. 运行 stable diffusion webui 目录的 webui-user.bat
-4. 运行 mcl 目录的 mcl.cmd, 或者在命令行中，运行`.\mcl`，显示 mirai-console started successfully 后，输入`login [你的qq号] [密码] MACOS`，如`login 1919810 114514 MACOS`，确保你输入的qq和config里的qq一致。
+4. 运行 mcl 目录的 mcl.cmd, 或者在命令行中，运行`.\mcl`，显示 mirai-console started successfully 后，输入`login [你的qq号] [密码] ANDROID_PAD`，如`login 1919810 114514 ANDROID_PAD`，确保你输入的qq和config里的qq一致。
 5. 运行 bot.bat
