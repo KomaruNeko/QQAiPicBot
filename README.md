@@ -35,8 +35,6 @@
 
    - 安装自动签名服务 [qsign](https://github.com/MrXiaoM/qsign部署方法)， 参考该repo的 **部署方法** 部分
 
-
-
 #### 3. 安装requirements
 1. 在终端中打开该文件夹，运行`pip install -r requirements.txt`
 ####  (如果你想用 anaconda)
@@ -50,5 +48,5 @@
 1. 在你想要安装这个bot的目录下右键打开git, 输入命令行`git clone https://github.com/KomaruNeko/QQAiPicBot.git`
 2. 根据说明，修改 config.ini
 3. 运行 stable diffusion webui 目录的 webui-user.bat
-4. 运行 mcl 目录的 mcl.cmd, 或者在命令行中，运行`.\mcl`，显示 mirai-console started successfully 后，输入`login [你的qq号] [密码] MACOS`，如`login 1919810 114514 ANDROID_PAD`，确保你输入的qq和config里的qq一致。
+4. 运行 mcl 目录的 mcl.cmd, 或者在命令行中，运行`.\mcl`，显示 mirai-console started successfully 后，输入`login [你的qq号] [密码] ANDROID_PAD`，如`login 1919810 114514 ANDROID_PAD`，确保你输入的qq和config里的qq一致。
 5. 运行 bot.bat
