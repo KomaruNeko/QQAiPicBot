@@ -26,9 +26,14 @@
 #### 2. 手动安装mcl
 1. 手动安装 [mirai-console-loader](https://github.com/iTXTech/mirai-console-loader)，参考该repo的**手动安装**部分
 2. 安装 [mirai-api-http](https://github.com/project-mirai/mirai-api-http)，参考该repo的**安装mirai-api-http**和**开始使用**部分
-3. 在 [fix-protocol-version](https://github.com/cssxsh/fix-protocol-version/releases)，下载最新fix-protocol-version-x.x.x.mirai2.jar，并移入 [你的mcl地址]\plugins 目录中
-   注：如果登陆遇到问题，建议查看这里 [mcl无法登录的临时处理方案](https://mirai.mamoe.net/topic/223/%E6%97%A0%E6%B3%95%E7%99%BB%E5%BD%95%E7%9A%84%E4%B8%B4%E6%97%B6%E5%A4%84%E7%90%86%E6%96%B9%E6%A1%88)。个人推荐先试试清空mcl目录下bots文件夹里的内容。
+3. 在 [fix-protocol-version](https://github.com/cssxsh/fix-protocol-version/releases/)，下载最新fix-protocol-version-x.x.x.mirai2.jar
+.mirai2.jar，并移入 [你的mcl地址]\plugins 目录中
+   
+   注：如果登陆遇到问题，建议查看这里 [mcl无法登录的临时处理方案](https://mirai.mamoe.net/topic/223/%E6%97%A0%E6%B3%95%E7%99%BB%E5%BD%95%E7%9A%84%E4%B8%B4%E6%97%B6%E5%A4%84%E7%90%86%E6%96%B9%E6%A1%88)。
+   
+   本次更新时已验证有效的登录问题解决方案：
 
+   - 安装自动签名服务 [qsign](https://github.com/MrXiaoM/qsign部署方法)， 参考该repo的 **部署方法** 部分
 
 #### 3. 安装requirements
 1. 在终端中打开该文件夹，运行`pip install -r requirements.txt`
